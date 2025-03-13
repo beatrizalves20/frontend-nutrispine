@@ -4,40 +4,45 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const CadastroPaciente = () => {
   const [formData, setFormData] = useState({
     nome: '',
+    CPF: '',
+    data: '',
     idade: '',
-    email: '',
-    CPF: ''
+    email: ''
   });
 
   const [mensagem, setMensagem] = useState('');
 
   // Função para atualizar os dados do formulário
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   // Função para enviar os dados ao backend
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMensagem(''); // Resetar mensagem ao enviar
+  e.preventDefault();
+  setMensagem(''); // Limpa a mensagem ao enviar
 
-    try {
-      const response = await fetch('http://127.0.0.1:5000/cadastrar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/v1/cadastrar/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json', // Garante que o backend envie JSON
+      },
+      body: JSON.stringify(formData),
+    });
 
-      if (response.ok) {
-        setMensagem('Paciente cadastrado com sucesso!');
-        setFormData({ nome: '', idade: '', email: '', CPF: '' });
-      } else {
-        setMensagem('Erro ao cadastrar paciente.');
-      }
-    } catch (error) {
-      setMensagem('Erro ao conectar com o servidor.');
+    const data = await response.json(); // Converte a resposta para JSON
+
+    if (response.ok) {
+      setMensagem('Paciente cadastrado com sucesso!');
+      setFormData({ nome: '', CPF: '', data: '', idade: '', email: '' });
+    } else {
+      // Trata mensagens de erro vindas do Django
+      setMensagem(data.detail || 'Erro ao cadastrar paciente.');
     }
-  };
+  } catch (error) {
+    setMensagem('Erro ao conectar com o servidor.');
+  }
+};
+
 
   return (
     <div className="flex-grow-1 p-5">
@@ -51,8 +56,10 @@ const CadastroPaciente = () => {
               name="nome"
               className="form-control"
               placeholder="Digite o nome do paciente"
-              value={formData.nome}
-              onChange={handleChange}
+              value={formData.name}
+              onChange={(e) => {
+                setFormData({ ...formData, [e.target.name]: e.target.value });
+              }}
               required
             />
           </div>
@@ -63,16 +70,20 @@ const CadastroPaciente = () => {
               name="cpf"
               className="form-control"
               placeholder="Digite seu CPF"
-              value={formData.cpf}
-              onChange={handleChange} required />
+              value={formData.name}
+              onChange={(e) => {
+                setFormData({ ...formData, [e.target.name]: e.target.value });
+              }} required />
           </div>
           <div>
             <label className="form-label">Data</label>
             <input
               type="date"
               name="data"
-              value={formData}
-              onChange={(e) => handleChange(e.target.value)}
+              value={formData.name}
+              onChange={(e) => ((e) => {
+                setFormData({ ...formData, [e.target.name]: e.target.value });
+              })(e.target.value)}
               required
             />
           </div>
@@ -83,8 +94,10 @@ const CadastroPaciente = () => {
               name="idade"
               className="form-control"
               placeholder="Digite a idade do paciente"
-              value={formData.idade}
-              onChange={handleChange}
+              value={formData.name}
+              onChange={(e) => {
+                setFormData({ ...formData, [e.target.name]: e.target.value });
+              }}
               required
             />
           </div>
@@ -95,8 +108,10 @@ const CadastroPaciente = () => {
               name="email"
               className="form-control"
               placeholder="Digite o e-mail"
-              value={formData.email}
-              onChange={handleChange}
+              value={formData.name}
+              onChange={(e) => {
+                setFormData({ ...formData, [e.target.name]: e.target.value });
+              }}
               required
             />
           </div>
