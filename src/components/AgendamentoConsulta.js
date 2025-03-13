@@ -10,33 +10,55 @@ const AgendamentoConsulta = () => {
   const [horario, setHorario] = useState("");
   const [consultas, setConsultas] = useState([]);
 
-  // Carregar consultas
-  useEffect(() => {
-    axios.get("http://127.0.0.1:5000/consultas").then((res) => {
-      setConsultas(res.data);
-    });
-  }, [consultas]);
-
-  // Agendar consulta
-  const agendarConsulta = async (e) => {
-    e.preventDefault();
-    await axios.post("http://127.0.0.1:5000/agendar", {
-      nome,
-      email,
-      data,
-      horario,
-    });
-    alert("Consulta agendada com sucesso!");
-    setNome("");
-    setEmail("");
-    setData("");
-    setHorario("");
+  // Função para carregar as consultas do backend
+  const carregarConsultas = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/consultas/");
+      setConsultas(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar consultas:", error);
+      alert("Erro ao carregar as consultas.");
+    }
   };
 
-  // Cancelar consulta
+  // Executa uma vez ao montar o componente
+  useEffect(() => {
+    carregarConsultas();
+  }, []);
+
+  // Função para agendar uma nova consulta
+  const agendarConsulta = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://127.0.0.1:8000/api/agendar/", {
+        nome,
+        email,
+        data,
+        horario,
+      });
+      alert("Consulta agendada com sucesso!");
+      // Limpa os campos e recarrega as consultas
+      setNome("");
+      setEmail("");
+      setData("");
+      setHorario("");
+      carregarConsultas();
+    } catch (error) {
+      console.error("Erro ao agendar consulta:", error);
+      alert("Erro ao agendar a consulta.");
+    }
+  };
+
+  // Função para cancelar uma consulta por ID
   const cancelarConsulta = async (id) => {
-    await axios.delete(`http://127.0.0.1:5000/cancelar/${id}`);
-    alert("Consulta cancelada!");
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/cancelar/${id}/`);
+      alert("Consulta cancelada!");
+      carregarConsultas();
+    } catch (error) {
+      console.error("Erro ao cancelar consulta:", error);
+      alert("Erro ao cancelar a consulta.");
+    }
   };
 
   return (
